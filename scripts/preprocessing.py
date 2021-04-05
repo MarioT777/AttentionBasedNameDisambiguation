@@ -49,10 +49,10 @@ def dump_author_social_relation_to_file():
             aid = '{}-{}'.format(pid, j)
             wf.write(aid + '\t' + author_social_relatoins + '\n')
     wf.close()
-    with open('./data/global_/Author2Id.json', 'w') as fp:
+    with open('./data/global/Author2Id.json', 'w') as fp:
         json.dump(Author2Id, fp)
         fp.close()
-    with open('./data/global_/Id2Author.json', 'w') as fp:
+    with open('./data/global/Id2Author.json', 'w') as fp:
         json.dump(Id2Author, fp)
         fp.close()
 
@@ -104,7 +104,7 @@ def cal_feature_idf():
     """
     calculate word IDF (Inverse document frequency) using publication data
     """
-    feature_dir = join(settings.DATA_DIR, 'global_')
+    feature_dir = settings.GLOBAL_DATA_DIR
     counter = dd(int)
     cnt = 0
     LMDB_NAME = 'pub_authors.feature'
@@ -154,20 +154,20 @@ if __name__ == '__main__':
     """
     some pre-processing
     """
-    print ("pass0")
-    dump_author_features_to_file()
-    print ("pass1")
-    dump_author_features_to_cache()
-    print ("pass2")
-    emb_model = EmbeddingModel.Instance()
-    emb_model.train('aminer')  # training word embedding model
-    cal_feature_idf()
-    print ("pass3")
-    dump_author_embs()
-    # print('done', datetime.now()-start_time)
+    # print ("pass0")
+    # dump_author_features_to_file()
+    # print ("pass1")
+    # dump_author_features_to_cache()
+    # print ("pass2")
+    # emb_model = EmbeddingModel.Instance()
+    # emb_model.train('aminer')  # training word embedding model
+    # cal_feature_idf()
+    # print ("pass3")
+    # dump_author_embs()
+    # # print('done', datetime.now()-start_time)
 
-    # Author social relation
-    print ("pass4")
+    # # Author social relation
+    # print ("pass4")
     dump_author_social_relation_to_file()
 
 

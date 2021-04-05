@@ -60,14 +60,14 @@ class OSM_CAA_Loss():
         embd : Fully Connected weights of classification layer (dxC), C is the number of classes: represents the vectors for class
         '''
         x = self.safe_divisor(x)
-        x = tf.math.l2_normalize(x, 1)
+        x = tf.nn.l2_normalize(x, 1)
         n = self.n
         r = tf.ones([n, 1], tf.float32)
 
         print ("r: ", r)
 
         dist = self.safe_divisor(r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r))
-        dist = self.safe_divisor(tf.math.sqrt(dist))
+        dist = self.safe_divisor(tf.sqrt(dist))
         dist = tf.clip_by_value(dist, clip_value_min=tf.constant(1e-12),
                                 clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
 
@@ -77,7 +77,7 @@ class OSM_CAA_Loss():
         S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),clip_value_max=tf.constant(1e12))
 
         # history reason
-        embd = tf.math.l2_normalize(embd, 0)
+        embd = tf.nn.l2_normalize(embd, 0)
 
         CenterDistance = self.pairwise_dist(x, tf.transpose(embd)) # x: (n,d), embed(c,d), CenterDistance(n,m)
         CenterDistance = self.safe_divisor(CenterDistance)
@@ -92,7 +92,7 @@ class OSM_CAA_Loss():
 
         atten_class = num / denom
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
-        A = tf.math.maximum(temp, tf.transpose(temp))
+        A = tf.maximum(temp, tf.transpose(temp))
 
         # atten_class = 1.0 - num / denom
         # temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])

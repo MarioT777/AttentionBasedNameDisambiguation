@@ -1,3 +1,11 @@
+'''
+Author: your name
+Date: 2021-03-17 18:27:25
+LastEditTime: 2021-03-28 18:07:51
+LastEditors: your name
+Description: In User Settings Edit
+FilePath: /AttentionBasedNameDisambiguation/utils/cache.py
+'''
 import os
 from os.path import join
 import lmdb

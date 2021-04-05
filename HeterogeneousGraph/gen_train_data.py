@@ -61,7 +61,6 @@ class DataGenerator:
             self.genPAPandPSP(authorName=authorName, idf_threshold=IDF_THRESHOLD)
 
 
-
     def genPAPandPSP(self, authorName="hongbin_li", idf_threshold=10):
         idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
         raw_word2vec = 'author_100.emb.weighted'

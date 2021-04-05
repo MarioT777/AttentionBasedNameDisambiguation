@@ -5,7 +5,8 @@ from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Dense, Input, Lambda, Average, Concatenate, Add
 from keras.optimizers import Adam
-from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy, global_triplet_loss
+from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy
+# global_triplet_loss
 from global_.embedding import EMB_DIM
 from utils import eval_utils
 from utils import data_utils
@@ -174,7 +175,8 @@ class GlobalTripletModel:
         model.summary()
         time.sleep(5.5)
 
-        model.compile(loss=global_triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
+        # model.compile(loss=global_triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
+        model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
         inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
 
@@ -197,6 +199,11 @@ class GlobalTripletModel:
 
         X_anchor, X_pos, X_neg, X_atten, X_atten_pos, X_atten_neg = X1, X2, X3, X4, X5, X6
         X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg, 'attention_input': X_atten, 'attention_input_posive': X_atten_pos, 'attention_input_negive': X_atten_neg}
+
+        print("===== check X =====")
+        print(X)
+        print("===== check X =====")
+        
         model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=5, shuffle=True, validation_split=0.2)
 
         model_json = model.to_json()

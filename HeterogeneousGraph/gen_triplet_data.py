@@ -43,9 +43,9 @@ class TripletsGenerator:
         self.name2pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')  # for test
         self.name2pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
         self.names_train = self.name2pubs_train.keys()
-        print('names train', len(self.names_train))
+        # print('names train', len(self.names_train))
         self.names_test = self.name2pubs_test.keys()
-        print('names test', len(self.names_test))
+        # print('names test', len(self.names_test))
         assert not set(self.names_train).intersection(set(self.names_test))
         for name in self.names_train:
             name_pubs_dict = self.name2pubs_train[name]
@@ -53,7 +53,7 @@ class TripletsGenerator:
                 self.pids_train += name_pubs_dict[aid]
         random.shuffle(self.pids_train)
         self.n_pubs_train = len(self.pids_train)
-        print('pubs2train', self.n_pubs_train)
+        # print('pubs2train', self.n_pubs_train)
 
         for name in self.names_test:
             name_pubs_dict = self.name2pubs_test[name]
@@ -61,7 +61,7 @@ class TripletsGenerator:
                 self.pids_test += name_pubs_dict[aid]
         random.shuffle(self.pids_test)
         self.n_pubs_test = len(self.pids_test)
-        print('pubs2test', self.n_pubs_test)
+        # print('pubs2test', self.n_pubs_test)
 
     def gen_neg_pid(self, not_in_pids, role='train'):
         if role == 'train':
@@ -167,8 +167,8 @@ class TripletsGenerator:
         cnt = 0
 
         while True:
-            if cnt % 1000 == 0:
-                print('get', cnt, datetime.now()-start_time)
+            # if cnt % 1000 == 0:
+                # print('get', cnt, datetime.now()-start_time)
             emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg = emb_q.get()
             if emb1 is False:
                 producer_p.terminate()
@@ -194,8 +194,8 @@ class TripletsGenerator:
         attenNeg_embs = []
         f_idx = 0
         for i, t in enumerate(triplets):
-            if i % 100 == 0:
-                print(i, datetime.now()-start_time)
+            # if i % 100 == 0:
+                # print(i, datetime.now()-start_time)
             emb_anc, emb_pos, emb_neg, emb_atten, attentionEmbPos, attentionEmbNeg = t[0], t[1], t[2], t[3], t[4], t[5]
             anchor_embs.append(emb_anc)
             pos_embs.append(emb_pos)

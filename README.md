@@ -1,18 +1,38 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-03-17 18:27:25
+ * @LastEditTime: 2021-03-28 18:07:38
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /AttentionBasedNameDisambiguation/README.md
+-->
 
 
 # Data
 
 Please download [data][https://static.aminer.cn/misc/na-data-kdd18.zip] here. Unzip the file and put the data directory into project directory.
 
+# ENV
+
+Tenserflow 1.6
+Python 3.0
 
 
 # RUN
 ```
 python3 scripts/preprocessing.py
 
-# global model
+# prepare data
 python3 HeterogeneousGraph/gen_train_data.py
+
+# HAN Run
+python3 HeterogeneousGraph/localHANMetricLearning.py
+
+# global model
+python3 HeterogeneousGraph/gen_triplet_data.py
 python3 HeterogeneousGraph/global_model.py
+
+# prepare local data
 python3 HeterogeneousGraph/prepare_local_data.py
 
 # train

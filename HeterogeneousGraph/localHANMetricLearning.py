@@ -1,3 +1,11 @@
+'''
+Author: your name
+Date: 2021-03-17 18:27:25
+LastEditTime: 2021-03-24 23:45:24
+LastEditors: your name
+Description: In User Settings Edit
+FilePath: /AttentionBasedNameDisambiguation/HeterogeneousGraph/localHANMetricLearning.py
+'''
 
 from HeterogeneousGraph.HAN import HAN
 from utils import settings
@@ -30,7 +38,6 @@ def testUser(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding2"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
-
     prec, rec, f1, pids, attentionEmbeddings = han.prepare_and_train(name=name, ispretrain=True, needtSNE=True)
     print (name, prec, rec, f1)
 

@@ -1,3 +1,11 @@
+'''
+Author: your name
+Date: 2021-03-17 18:27:25
+LastEditTime: 2021-04-01 11:28:48
+LastEditors: Please set LastEditors
+Description: In User Settings Edit
+FilePath: /AttentionBasedNameDisambiguation/utils/data_utils.py
+'''
 import codecs
 import json
 from os.path import join
@@ -16,8 +24,8 @@ def dump_json(obj, wfpath, wfname, indent=None):
         json.dump(obj, wf, ensure_ascii=False, indent=indent)
 
 
-
 def dump_data(obj, wfpath, wfname):
+    print("checked trying dump {} ..!!".format(wfname))
     with open(os.path.join(wfpath, wfname), 'wb') as wf:
         pickle.dump(obj, wf)
 
@@ -29,7 +37,6 @@ def load_data(rfpath, rfname):
 
 def serialize_embedding(embedding):
     return pickle.dumps(embedding)
-
 
 def deserialize_embedding(s):
     return pickle.loads(s)
