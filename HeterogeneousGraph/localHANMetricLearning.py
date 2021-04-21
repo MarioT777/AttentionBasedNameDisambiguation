@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-17 18:27:25
-LastEditTime: 2021-04-11 11:35:49
+LastEditTime: 2021-04-21 21:57:27
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/HeterogeneousGraph/localHANMetricLearning.py
@@ -24,24 +24,21 @@ def load_train_names():
 
 def testHAN():
     LMDB_NAME_EMB = settings.LMDB_NAME_EMB
+    LMDB_PAPER_CENTER_EMB = settings.LMDB_PAPER_CENTER_EMB
+
     lc_emb = LMDBClient(LMDB_NAME_EMB)
+    lc_emb_centers = LMDBClient(LMDB_PAPER_CENTER_EMB)
     han = HAN(lc_emb)
 
     name_to_pubs_train = load_train_names()
     for name in name_to_pubs_train:
-        prec, rec, f1, pids, attentionEmbeddings, Attention_model = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
+        prec, rec, f1, pids, attentionEmbeddings, centers_embed_check = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
         for pid, attentionEmbedding in zip(pids, attentionEmbeddings):
             lc_emb.set(pid, attentionEmbedding)
         
-        print("==== check Attention_model ===== ")
-        print(Attention_model)
-        # ==== check Attention_model ===== 
-        # Tensor("Maximum:0", shape=(307, 307), dtype=float32)
+        for labelid, centerembedding in enumerate(centers_embed_check):
+            lc_emb_centers.set(name+str(labelid), centerembedding)
 
-        print(attentionEmbedding)
-
-
-        print("==== check Attention_model ===== ")
 
         print (name, prec, rec, f1)
         break
@@ -50,7 +47,7 @@ def testUser(name):
     LMDB_NAME_EMB = settings.LMDB_NAME_EMB
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
-    prec, rec, f1, pids, attentionEmbeddings , Attention_model= han.prepare_and_train(name=name, ispretrain=True, needtSNE=True)
+    prec, rec, f1, pids, attentionEmbeddings, centers_embed_check = han.prepare_and_train(name=name, ispretrain=True, needtSNE=True)
     print (name, prec, rec, f1)
 
 if __name__ == '__main__':

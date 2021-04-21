@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-17 18:27:25
-LastEditTime: 2021-03-18 11:52:12
+LastEditTime: 2021-04-21 21:42:19
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/utils/settings.py
@@ -20,4 +20,5 @@ os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(EMB_DATA_DIR, exist_ok=True)
 
 LMDB_NAME_EMB = "lc_attention_network_embedding2"
+LMDB_PAPER_CENTER_EMB = "lc_attention_network_embedding_centers"
 

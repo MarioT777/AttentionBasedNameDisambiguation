@@ -152,11 +152,11 @@ class HAN():
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
 
-        prec, rec, f1, attentionEmbeddings, attentionModel = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
+        prec, rec, f1, attentionEmbeddings, centers_embed_check = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
 
         # self.saveFinalEmbedding(pids, attentionEmbeddings)
 
-        return prec, rec, f1, pids, attentionEmbeddings, attentionModel
+        return prec, rec, f1, pids, attentionEmbeddings, centers_embed_check
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
@@ -193,7 +193,6 @@ class HAN():
     def mkdir(self, path):
 
         folder = os.path.exists(path)
-
         if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
             os.makedirs(path)  # makedirs 创建文件时如果路径不存在会创建这个路径
 
@@ -395,6 +394,7 @@ class HAN():
             # print ("ftr_resh: ", ftr_resh)
             print ("lab_resh: ", lab_resh)
             print ("fea_list: ", fea_list)
+            # centers_embed:  Tensor("transpose:0", shape=(100, 17), dtype=float32)
             print ("centers_embed: ", centers_embed)
             print ("batch_size, nb_nodes, nb_classes, ft_size", batch_size, nb_nodes, nb_classes, ft_size)
 
@@ -545,7 +545,7 @@ class HAN():
                     fd = fd1
                     fd.update(fd2)
                     fd.update(fd3)
-                    loss_value_ts, acc_ts, jhy_final_embedding, test_final_embeed_check, Attention_model_check = sess.run([loss, accuracy, final_embedding, test_final_embeed, Attention_model],
+                    loss_value_ts, acc_ts, jhy_final_embedding, test_final_embeed_check, centers_embed_check = sess.run([loss, accuracy, final_embedding, test_final_embeed, centers_embed],
                                                                           feed_dict=fd)
                     ts_loss += loss_value_ts
                     ts_acc += acc_ts
@@ -576,7 +576,7 @@ class HAN():
 
                 sess.close()
 
-        return prec, rec, f1, xx2, Attention_model_check
+        return prec, rec, f1, xx2, centers_embed_check
 
 if __name__ == '__main__':
     pass
