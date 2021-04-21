@@ -26,7 +26,12 @@ python3 scripts/preprocessing.py
 python3 HeterogeneousGraph/gen_train_data.py
 
 # HAN Run
+# localtraing
 python3 HeterogeneousGraph/localHANMetricLearning.py
+
+# groupsSampling
+
+
 
 # global model
 python3 HeterogeneousGraph/gen_triplet_data.py

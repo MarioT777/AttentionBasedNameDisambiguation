@@ -262,7 +262,6 @@ def my_Kmeans(x, y, k=4, time=10, return_NMI=False):
     ARI_list = []  # adjusted_rand_score(
     NMI_list = []
     if time:
-        # print('KMeans exps {}次 æ±~B平å~]~G '.format(time))
         for i in range(time):
             estimator.fit(x, y)
             y_pred = estimator.predict(x)

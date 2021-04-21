@@ -152,11 +152,11 @@ class HAN():
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
 
-        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
+        prec, rec, f1, attentionEmbeddings, attentionModel = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
 
         # self.saveFinalEmbedding(pids, attentionEmbeddings)
 
-        return prec, rec, f1, pids, attentionEmbeddings
+        return prec, rec, f1, pids, attentionEmbeddings, attentionModel
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
@@ -264,7 +264,7 @@ class HAN():
             osm_caa_loss = OSM_CAA_Loss(batch_size=nb_nodes)
             osm_loss = osm_caa_loss.forward
 
-            osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
+            osmLoss, checkvalue, Attention_model = osm_loss(final_embedding, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = osmLoss
 
@@ -407,7 +407,7 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
+            osmLoss, checkvalue, Attention_model = osm_loss(final_embedding, rawlabels, centers_embed)
             # osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = osmLoss
@@ -462,7 +462,7 @@ class HAN():
                         _, loss_value_tr, acc_tr, att_val_train = sess.run([train_op, loss, accuracy, att_val],
                                                                            feed_dict=fd)
                         test_check_value = sess.run(checkvalue, feed_dict=fd)
-                        print ("test_check_value: ", test_check_value)
+                        # print ("test_check_value: ", test_check_value)
 
                         train_loss_avg += loss_value_tr
                         train_acc_avg += acc_tr
@@ -545,7 +545,7 @@ class HAN():
                     fd = fd1
                     fd.update(fd2)
                     fd.update(fd3)
-                    loss_value_ts, acc_ts, jhy_final_embedding, test_final_embeed_check = sess.run([loss, accuracy, final_embedding, test_final_embeed],
+                    loss_value_ts, acc_ts, jhy_final_embedding, test_final_embeed_check, Attention_model_check = sess.run([loss, accuracy, final_embedding, test_final_embeed, Attention_model],
                                                                           feed_dict=fd)
                     ts_loss += loss_value_ts
                     ts_acc += acc_ts
@@ -576,7 +576,7 @@ class HAN():
 
                 sess.close()
 
-        return prec, rec, f1, xx2
+        return prec, rec, f1, xx2, Attention_model_check
 
 if __name__ == '__main__':
     pass

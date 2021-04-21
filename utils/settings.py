@@ -18,3 +18,6 @@ EMB_DATA_DIR = join(DATA_DIR, 'emb')
 GLOBAL_DATA_DIR = join(DATA_DIR, 'global')
 os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(EMB_DATA_DIR, exist_ok=True)
+
+LMDB_NAME_EMB = "lc_attention_network_embedding2"
+
