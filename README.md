@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-03-17 18:27:25
- * @LastEditTime: 2021-03-28 18:07:38
+ * @LastEditTime: 2021-04-24 18:32:34
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /AttentionBasedNameDisambiguation/README.md
@@ -31,7 +31,11 @@ python3 HeterogeneousGraph/localHANMetricLearning.py
 
 # groupsSampling
 
+python3 DisambiguateRateSample/GenerateData.py
+python3 DisambiguateRateSample/DisambiguateMetricLearning.py
 
+
+<!--  以下命令弃用 -->
 
 # global model
 python3 HeterogeneousGraph/gen_triplet_data.py
