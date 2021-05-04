@@ -50,7 +50,9 @@ class HAN():
         classes_dict = {c: i for i, c in enumerate(classes)}
         res = [[label, classes_dict[label]] for label in labels]
         rawlabels = [classes_dict[label] for label in labels]
-        return self.enc.fit_transform(res).toarray(), np.array(rawlabels)
+        encode_label = self.enc.fit_transform(res).toarray()
+        temp_encode_label = encode_label.tolist()
+        return encode_label , np.array(rawlabels)
 
     def constructAdj(self, pids):
         pid2idx = {c: i for i, c in enumerate(pids)}
@@ -128,6 +130,7 @@ class HAN():
 
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
+        print("turelabel.shape: {}".format(truelabels.shape))
         print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
         print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
@@ -138,8 +141,11 @@ class HAN():
         self.name = name
         # loadData(name)
         rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=ispretrain)
+        pid2rawlabels2 = dict(zip(pids, rawlabels))
+        
+        
         print ("rawlabes: ", len(set(rawlabels)))
-        #
+        
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
 
         PAP = self.loadPAP(PAP, pid2idx, name, ispretrain=ispretrain)
@@ -156,7 +162,19 @@ class HAN():
 
         # self.saveFinalEmbedding(pids, attentionEmbeddings)
 
-        return prec, rec, f1, pids, attentionEmbeddings, centers_embed_check
+        print("======= check =======")
+
+        print(centers_embed_check.shape)
+        # print(pid2rawlabels2)
+        print("======= check =======")
+
+        # each paper centers embedding
+        paper_center_embedd_check = {}
+        for (pid, labelid) in pid2idx.items():
+            paper_center_embedd_check[pid] = centers_embed_check[pid2rawlabels2[pid]]
+            
+
+        return prec, rec, f1, pids, attentionEmbeddings, paper_center_embedd_check
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
@@ -411,6 +429,13 @@ class HAN():
             # osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = osmLoss
+            
+            
+            # 把centers_embed转回来，因为要输出对比
+
+            centers_embed = tf.transpose(centers_embed)
+            # 
+            
             # 为什么loss会固定
             # loss = osmLoss
             # loss = SoftMaxloss

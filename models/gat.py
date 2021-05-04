@@ -62,6 +62,7 @@ class HeteGAT_multi(BaseGAttN):
         print ("====== getCenters =====")
         print ("labels:", labels)
         print ("final_embed: ", final_embed)
+        # ====== （17，100） =====
         print ("centers: ", centers)
         print ("appear_times: ", appear_times)
         print ("centers_count: ", centers_count)
@@ -118,12 +119,21 @@ class HeteGAT_multi(BaseGAttN):
         # feature_size, labels, features
         # num_classes, feature_size, labels, features
 
+
+        # print("====== check labels and nbclass ======")
+        # print(labels)
+        # print(len(set(labels)))
+        # print(nb_classes)
+        # print("====== check labels and nbclass ======")
+
+
         centers_embed = HeteGAT_multi.getCenters(len(set(labels)), feature_size, labels, final_embed)
+        
+        # 尝试取消置换 
         centers_embed = tf.transpose(centers_embed)
 
         out = []
         for i in range(n_heads[-1]):
-      
             out.append(tf.layers.dense(final_embed, nb_classes, activation=None))
 
         #     out.append(layers.attn_head(h_1, bias_mat=bias_mat,

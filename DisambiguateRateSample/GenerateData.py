@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-21 22:48:24
-LastEditTime: 2021-04-23 15:45:22
+LastEditTime: 2021-05-03 22:30:15
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/DisambiguateRateSample/GenerateData.py
@@ -59,10 +59,12 @@ class TripletsGenerator:
         self.names_test = self.name2pubs_test.keys()
         # print('names test', len(self.names_test))
         assert not set(self.names_train).intersection(set(self.names_test))
+        
         for name in self.names_train:
             name_pubs_dict = self.name2pubs_train[name]
             for aid in name_pubs_dict:
                 self.pids_train += name_pubs_dict[aid]
+
         random.shuffle(self.pids_train)
         self.n_pubs_train = len(self.pids_train)
         # print('pubs2train', self.n_pubs_train)
@@ -71,6 +73,7 @@ class TripletsGenerator:
             name_pubs_dict = self.name2pubs_test[name]
             for aid in name_pubs_dict:
                 self.pids_test += name_pubs_dict[aid]
+        
         random.shuffle(self.pids_test)
         self.n_pubs_test = len(self.pids_test)
         # print('pubs2test', self.n_pubs_test)
@@ -209,7 +212,10 @@ class TripletsGenerator:
         attenNeg_embs = []
         emb_centers = []
         f_idx = 0
+        
+
         for i, t in enumerate(triplets):
+            print("check triplets i: ", i)
             # if i % 100 == 0:
                 # print(i, datetime.now()-start_time)
             emb_anc, emb_pos, emb_neg, emb_atten, attentionEmbPos, attentionEmbNeg, emb_center = t[0], t[1], t[2], t[3], t[4], t[5], t[6]

@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-23 16:08:20
-LastEditTime: 2021-04-24 18:07:03
+LastEditTime: 2021-05-04 00:51:37
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/DisambiguateRateSample/DisambiguateMetricLearning.py
@@ -14,8 +14,8 @@ from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Dense, Input, Lambda, Average, Concatenate, Add
 from keras.optimizers import Adam
-from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy
-from global_.triplet import disambiguate_distance
+from global_.triplet import l2Norm, triplet_loss, accuracy
+from global_.triplet import disambiguate_distance_rate
 # global_triplet_loss
 from global_.embedding import EMB_DIM
 from utils import eval_utils
@@ -71,7 +71,14 @@ class GlobalTripletModel:
             f_num = self.test_triplet_files_num
         for i in range(f_num):
             print('load', i)
-            x1_batch, x2_batch, x3_batch, x4_batch, x5_batch, x6_batch, x7_batch, center_batch = self.load_batch_triplets(i, role)
+            x1_batch, x2_batch, x3_batch, x4_batch, x5_batch, x6_batch, center_batch = self.load_batch_triplets(i, role)
+            
+            
+            print(" ======== check center_batch ========")
+            print("EMB_DIM: ",EMB_DIM)
+            print(len(center_batch), len(center_batch[0]))
+            print(" ======== check center_batch ========")
+
             p = np.random.permutation(len(x1_batch))
             x1_batch = np.array(x1_batch)[p]
             x2_batch = np.array(x2_batch)[p]
@@ -96,6 +103,7 @@ class GlobalTripletModel:
         emb_anchor = Input(shape=(EMB_DIM, ), name='anchor_input')
         emb_pos = Input(shape=(EMB_DIM, ), name='pos_input')
         emb_neg = Input(shape=(EMB_DIM, ), name='neg_input')
+        
         emb_atten = Input(shape=(EMB_DIM, ), name='attention_input')
         emb_atten_pos = Input(shape=(EMB_DIM, ), name='attention_input_posive')
         emb_atten_neg = Input(shape=(EMB_DIM, ), name='attention_input_negive')
@@ -104,29 +112,15 @@ class GlobalTripletModel:
         # shared layers
         layer1 = Dense(200, activation='relu', name='first_emb_layer')
         layer2 = Dense(100, activation='relu', name='last_emb_layer')
-
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[100])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
 
-        pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
-        neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
+        pos_dist = Lambda(disambiguate_distance_rate, name='disambiguate_distance_rate_postive')([encoded_emb, encoded_emb_pos, emb_atten_pos, emb_atten, emb_center])
+        neg_dist = Lambda(disambiguate_distance_rate, name='disambiguate_distance_rate_negtive')([encoded_emb, encoded_emb_neg, emb_atten_neg, emb_atten, emb_center])
         
-        PositiveDisambiguateDistance = Lambda(disambiguate_distance, name='PositiveDisambiguateDistance')([emb_atten_pos, emb_atten, emb_center])
-        NegativeDisambiguateDistance = Lambda(disambiguate_distance, name='NegativeDisambiguateDistance')([emb_atten_neg, emb_atten, emb_center])
-
-        print("=============== check DisambiguateDistance  ==========")
-
-        print(pos_dist)
-
-        print(PositiveDisambiguateDistance)
-
-        print("=============== check DisambiguateDistance  ==========")
-
-        pos_dist = pos_dist * PositiveDisambiguateDistance
-        neg_dist = neg_dist * NegativeDisambiguateDistance
 
         def cal_output_shape(input_shape):
             shape = list(input_shape[0])
@@ -141,7 +135,9 @@ class GlobalTripletModel:
         )([pos_dist, neg_dist])
         
         model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg, emb_center], stacked_dists, name='triple_siamese')
-        
+        # model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
+
+
         import time
         model.summary()
         time.sleep(5.5)
@@ -171,7 +167,7 @@ class GlobalTripletModel:
         X_anchor, X_pos, X_neg, X_atten, X_atten_pos, X_atten_neg, emb_center = X1, X2, X3, X4, X5, X6, Center
         X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg, 'attention_input': X_atten, 'attention_input_posive': X_atten_pos, 'attention_input_negive': X_atten_neg, 'emb_center': emb_center}
 
-# === check ===
+        # === check ===
 
         print("===== check X =====")
         print(X)

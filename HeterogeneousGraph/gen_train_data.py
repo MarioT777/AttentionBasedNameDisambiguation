@@ -60,14 +60,24 @@ class DataGenerator:
         for authorName in self.names_train:
             self.genPAPandPSP(authorName=authorName, idf_threshold=IDF_THRESHOLD)
 
+        for authorName in self.name2pubs_test:
+            self.genPAPandPSP(authorName=authorName, idf_threshold=IDF_THRESHOLD, model='test')
 
-    def genPAPandPSP(self, authorName="hongbin_li", idf_threshold=10):
+
+    def genPAPandPSP(self, authorName="hongbin_li", idf_threshold=10, model='train'):
         idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
         raw_word2vec = 'author_100.emb.weighted'
         lc_emb = LMDBClient(raw_word2vec)
         LMDB_AUTHOR_FEATURE = "pub_authors.feature"
         lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
-        cur_person_dict = self.name2pubs_train[authorName]
+        
+        if model == "train":
+            cur_person_dict = self.name2pubs_train[authorName]
+        elif model == "test":
+            cur_person_dict = self.name2pubs_test[authorName]
+        else:
+            cur_person_dict = None
+        
         pids_set = set()
         pids = []
         pids2label = {}
