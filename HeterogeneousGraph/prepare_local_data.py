@@ -3,7 +3,7 @@ from os.path import join
 import os
 import numpy as np
 from numpy.random import shuffle
-from HeterogeneousGraph.global_model import GlobalTripletModel
+from DisambiguateRateSample.DisambiguateMetricLearning import GlobalTripletModel
 from utils.eval_utils import get_hidden_output
 from utils.cache import LMDBClient
 from utils import data_utils, inputData
@@ -20,10 +20,14 @@ def dump_inter_emb():
     dump hidden embedding via trained global_ model for local model to use
     """
     Res = defaultdict(list)
+
+    
     LMDB_NAME = "author_100.emb.weighted"
     raw_lc_input = LMDBClient(LMDB_NAME)
+
     INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
     lc_inter = LMDBClient(INTER_LMDB_NAME)
+    
     global_model = GlobalTripletModel(data_scale=1000000)
     trained_global_model = global_model.load_triplets_model()
 
@@ -45,6 +49,7 @@ def dump_inter_emb():
                 pids.append(pid)
         embs_input = np.stack(embs_input)
         inter_embs = get_hidden_output(trained_global_model, embs_input)
+        
         for i, pid_ in enumerate(pids):
             lc_inter.set(pid_, inter_embs[i])
             Res[pid_].append(inter_embs[i])
@@ -59,7 +64,7 @@ def dump_inter_emb():
             if len(name_data[aid]) < 5:  # n_pubs of current author is too small
                 continue
             for pid in name_data[aid]:
-                cur_emb = lc_input.get(pid)
+                cur_emb = raw_lc_input.get(pid)
                 if cur_emb is None:
                     continue
                 embs_input.append(cur_emb)
