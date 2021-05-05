@@ -1,11 +1,12 @@
 <!--
  * @Author: your name
  * @Date: 2021-03-17 18:27:25
- * @LastEditTime: 2021-05-04 03:42:00
+ * @LastEditTime: 2021-05-05 21:30:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /AttentionBasedNameDisambiguation/README.md
 -->
+
 
 
 # Data
@@ -13,9 +14,8 @@
 Please download [data][https://static.aminer.cn/misc/na-data-kdd18.zip] here. Unzip the file and put the data directory into project directory.
 
 # ENV
-
-Tenserflow 1.6
-Python 3.0
+conda creat -n test python==3.6.9
+pip install -r requirements.txt
 
 
 # RUN
