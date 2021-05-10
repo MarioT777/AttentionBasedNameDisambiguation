@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-17 22:37:38
-LastEditTime: 2021-05-04 09:52:40
+LastEditTime: 2021-05-04 08:22:16
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/global_/triplet.py
@@ -27,6 +27,7 @@ def euclidean_distance(vects):
 
 def disambiguate_distance_rate(arguments):
 
+    # 内嵌函数，因为报了undefine的错
     def euclidean_distance(vects):
         x, y = vects
         return K.sqrt(K.maximum(K.sum(K.square(x - y), axis=1, keepdims=True), K.epsilon())) 

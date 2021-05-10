@@ -245,6 +245,12 @@ def main():
     wf.write('name,n_pubs,n_clusters,precision,recall,f1\n')
     metrics = np.zeros(3)
     cnt = 0
+
+    macro_prec_avg = 0
+    macro_rec_avg = 0
+    macro_f1_avg = 0
+
+
     for name in names:
         cur_metric, num_nodes, n_clusters = gae_for_na(name, rawfeature="attention_feature")
         # cur_metric, num_nodes, n_clusters = gae_for_na(name, rawfeature="attention_feature")
@@ -257,12 +263,19 @@ def main():
         macro_prec = metrics[0] / cnt
         macro_rec = metrics[1] / cnt
         macro_f1 = cal_f1(macro_prec, macro_rec)
+
+        macro_prec_avg += macro_prec
+        macro_rec_avg += macro_rec_avg
+        macro_f1_avg += macro_f1
+
         print('average until now', [macro_prec, macro_rec, macro_f1])
         time_acc = time.time()-start_time
         print(cnt, 'names', time_acc, 'avg time', time_acc/cnt)
-    macro_prec = metrics[0] / cnt
-    macro_rec = metrics[1] / cnt
-    macro_f1 = cal_f1(macro_prec, macro_rec)
+    
+    macro_prec_ = macro_prec_avg / cnt
+    macro_rec = macro_rec_avg / cnt
+    macro_f1 = macro_f1_avg / cnt
+
     wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}\n'.format(
         macro_prec, macro_rec, macro_f1))
     wf.close()
@@ -283,6 +296,8 @@ if __name__ == '__main__':
     # print ("not raw feature: ", Res2)
     # print ("triplet raw feature: ", Res3)
     main()
+
+
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
 
@@ -292,3 +307,4 @@ if __name__ == '__main__':
 # 5712 data/local/graph-32/kexin_xu_pubs_network.txt
 
 
+# average until now [0.7509695493338227, 0.6284136254612461, 0.6842471413760391]
