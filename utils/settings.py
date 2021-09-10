@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-17 18:27:25
-LastEditTime: 2021-04-21 21:42:19
+LastEditTime: 2021-05-13 23:17:05
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /AttentionBasedNameDisambiguation/utils/settings.py
@@ -9,7 +9,15 @@ FilePath: /AttentionBasedNameDisambiguation/utils/settings.py
 from os.path import abspath, dirname, join
 import os
 
+
+
+
 PROJ_DIR = join(abspath(dirname(__file__)), '..')
+
+# 指定gpu
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
 
 DATA_DIR = join(PROJ_DIR, 'data')
 OUT_DIR = join(PROJ_DIR, 'out')

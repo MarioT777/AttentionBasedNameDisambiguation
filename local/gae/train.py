@@ -27,6 +27,7 @@ from utils.data_utils import load_json
 from utils.eval_utils import pairwise_precision_recall_f1, cal_f1
 from utils import settings, tSNEAnanlyse
 
+from sklearn.metrics.cluster import normalized_mutual_info_score
 
 # Settings
 flags = tf.app.flags
@@ -104,13 +105,13 @@ def load_local_data(path=local_na_dir, name='cheng_cheng', rawfeature=False):
 
     return adj, features, labels
 
-def gae_for_na(name, rawfeature):
+def gae_for_na(name, rawfeature, local_data_path=join(settings.DATA_DIR, 'local', 'graph-{}'.format(IDF_THRESHOLD))):
     """
     train and evaluate disambiguation results for a specific name
     :param name:  author name
     :return: evaluation results
     """
-    adj, features, labels = load_local_data(name=name, rawfeature=rawfeature)
+    adj, features, labels = load_local_data(path=local_data_path, name=name, rawfeature=rawfeature)
 
     # Store original adjacency matrix (without diagonal entries) for later
     adj_orig = adj
@@ -202,15 +203,22 @@ def gae_for_na(name, rawfeature):
     emb_norm = normalize_vectors(emb)
     clusters_pred = clustering(emb_norm, num_clusters=n_clusters)
     prec, rec, f1 =  pairwise_precision_recall_f1(clusters_pred, labels)
+
+    NMI1 = normalized_mutual_info_score(clusters_pred, labels)
+
     print('pairwise precision', '{:.5f}'.format(prec),
           'recall', '{:.5f}'.format(rec),
-          'f1', '{:.5f}'.format(f1))
+          'f1', '{:.5f}'.format(f1),
+          'NMI : ', '{:.5f}'.format(NMI1))
 
     clusters_pred2 = clustering(features, num_clusters=n_clusters)
     prec2, rec2, f12 =  pairwise_precision_recall_f1(clusters_pred2, labels)
+
+    NMI2 = normalized_mutual_info_score(clusters_pred2, labels)
     print('pairwise precision', '{:.5f}'.format(prec2),
           'recall', '{:.5f}'.format(rec2),
-          'f1', '{:.5f}'.format(f12))
+          'f1', '{:.5f}'.format(f12),
+          'NMI : ', '{:.5f}'.format(NMI2))
 
     from sklearn.manifold import TSNE
     features_new = TSNE(learning_rate=100).fit_transform(features)
@@ -219,6 +227,7 @@ def gae_for_na(name, rawfeature):
     labels = np.array(labels) + 2
     clusters_pred = np.array(clusters_pred) + 2
     clusters_pred2 = np.array(clusters_pred2) + 2
+
 
     if rawfeature == RAW_INTER_NAME:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_raw.png" % (name)))
@@ -232,7 +241,7 @@ def gae_for_na(name, rawfeature):
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_triplet.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_triplet.png" % (name)))
 
-    return [prec, rec, f1], num_nodes, n_clusters
+    return [prec, rec, f1, prec2, rec2, f12, NMI1, NMI2], num_nodes, n_clusters
 
 
 def load_test_names():
@@ -242,33 +251,41 @@ def load_test_names():
 def main():
     names = load_test_names()
     wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
-    wf.write('name,n_pubs,n_clusters,precision,recall,f1\n')
-    metrics = np.zeros(3)
+    wf.write('name,n_pubs,n_clusters,precision,recall,f1, NMI\n')
+    metrics = np.zeros(8)
     cnt = 0
 
     macro_prec_avg = 0
     macro_rec_avg = 0
     macro_f1_avg = 0
-
+    nmi_avg = 0
 
     for name in names:
         cur_metric, num_nodes, n_clusters = gae_for_na(name, rawfeature="attention_feature")
         # cur_metric, num_nodes, n_clusters = gae_for_na(name, rawfeature="attention_feature")
-        wf.write('{0},{1},{2},{3:.5f},{4:.5f},{5:.5f}\n'.format(
-            name, num_nodes, n_clusters, cur_metric[0], cur_metric[1], cur_metric[2]))
+            
+        wf.write('{0},{1},{2},{3:.5f},{4:.5f},{5:.5f}, {6:.5f}\n'.format(
+            name, num_nodes, n_clusters, cur_metric[0], cur_metric[1], cur_metric[2] , cur_metric[6]  ))
+        
+        wf.write('{0},{1},{2},{3:.5f},{4:.5f},{5:.5f}, {6:.5f}\n'.format(
+            name + str('_raw_feature'), num_nodes, n_clusters, cur_metric[3], cur_metric[4], cur_metric[5], cur_metric[7]))
+
         wf.flush()
         for i, m in enumerate(cur_metric):
             metrics[i] += m
         cnt += 1
         macro_prec = metrics[0] / cnt
         macro_rec = metrics[1] / cnt
+        macro_nmi = metrics[6] / cnt
+
         macro_f1 = cal_f1(macro_prec, macro_rec)
 
         macro_prec_avg += macro_prec
         macro_rec_avg += macro_rec_avg
         macro_f1_avg += macro_f1
+        nmi_avg += macro_nmi
 
-        print('average until now', [macro_prec, macro_rec, macro_f1])
+        print('average until now', [macro_prec, macro_rec, macro_f1, macro_nmi])
         time_acc = time.time()-start_time
         print(cnt, 'names', time_acc, 'avg time', time_acc/cnt)
     
@@ -276,8 +293,8 @@ def main():
     macro_rec = macro_rec_avg / cnt
     macro_f1 = macro_f1_avg / cnt
 
-    wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}\n'.format(
-        macro_prec, macro_rec, macro_f1))
+    wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}, {3:.5f}\n'.format(
+        macro_prec, macro_rec, macro_f1, macro_nmi))
     wf.close()
 
 

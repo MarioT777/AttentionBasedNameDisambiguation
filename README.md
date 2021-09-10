@@ -1,21 +1,26 @@
 <!--
  * @Author: your name
  * @Date: 2021-03-17 18:27:25
- * @LastEditTime: 2021-05-05 21:30:42
+ * @LastEditTime: 2021-05-16 07:51:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /AttentionBasedNameDisambiguation/README.md
 -->
-
-
 
 # Data
 
 Please download [data][https://static.aminer.cn/misc/na-data-kdd18.zip] here. Unzip the file and put the data directory into project directory.
 
 # ENV
+
+```
 conda creat -n test python==3.6.9
+
 pip install -r requirements.txt
+
+mkdir -p pic/FINALResult/
+
+```
 
 
 # RUN
@@ -40,6 +45,8 @@ python3 HeterogeneousGraph/prepare_local_data.py
 python3 local/gae/train.py
 
 ```
+
+
 
 
 
